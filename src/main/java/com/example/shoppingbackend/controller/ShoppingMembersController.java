@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +35,8 @@ public class ShoppingMembersController {
         }
 
         int id = member.getId();
-        String token = jwtService.getToken("id", id); /* 토큰 생성 */
+        int admin = member.getAdmin();
+        String token = jwtService.getToken(id, admin); /* 토큰 생성 */
 
         Cookie cookie = new Cookie("token", token);
         cookie.setHttpOnly(true);
@@ -61,8 +63,15 @@ public class ShoppingMembersController {
         Claims claims = jwtService.getClaims(token);
 
         if (claims != null) {
-            int id = Integer.parseInt(claims.get("id").toString());
-            return new ResponseEntity<>(id, HttpStatus.OK);
+            int id = jwtService.getId(token);
+            int admin = jwtService.getAdmin(token);
+
+            Map<String, Object> result = new HashMap<>();
+
+            result.put("id", id);
+            result.put("admin", admin);
+
+            return new ResponseEntity<>(result, HttpStatus.OK);
         }
 
         return new ResponseEntity<>(null, HttpStatus.OK);

@@ -15,7 +15,7 @@ public class JwtServiceImpl implements JwtService {
 
     private String secretKey = "avndsjklgtwjq@1n54k693ja!&%$lgfdnansljh9402ngmlamvj";
     @Override
-    public String getToken(String key, Object value) {
+    public String getToken(Object id, Object admin) {
 
         Date expTime = new Date();
         expTime.setTime(expTime.getTime() + 1000 * 60 * 30);
@@ -29,7 +29,8 @@ public class JwtServiceImpl implements JwtService {
 
         Map<String, Object> map = new HashMap<>();
 
-        map.put(key, value);
+        map.put("id", id);
+        map.put("admin", admin);
 
         JwtBuilder builder = Jwts.builder().setHeader(headerMap)
                 .setClaims(map)
@@ -69,6 +70,17 @@ public class JwtServiceImpl implements JwtService {
 
         if (claims != null) {
             return Integer.parseInt(claims.get("id").toString());
+        }
+
+        return 0;
+    }
+
+    @Override
+    public int getAdmin(String token) {
+        Claims claims = this.getClaims(token);
+
+        if (claims != null) {
+            return Integer.parseInt(claims.get("admin").toString());
         }
 
         return 0;
